@@ -8,7 +8,7 @@
 # Note that we're explicitly using the Debian bookworm image to make sure we're
 # compatible with the Debian container we'll be copying the pathfinder
 # executable to.
-FROM --platform=$BUILDPLATFORM lukemathwalker/cargo-chef:0.1.67-rust-1.80-slim-bookworm AS cargo-chef
+FROM --platform=$BUILDPLATFORM lukemathwalker/cargo-chef:0.1.71-rust-1.85-slim-bookworm AS cargo-chef
 WORKDIR /usr/src/pathfinder
 
 FROM --platform=$BUILDPLATFORM cargo-chef AS rust-planner
@@ -22,6 +22,19 @@ ARG CARGO_EXTRA_ARGS
 ARG TARGETARCH
 COPY ./build/prepare.sh prepare.sh
 RUN TARGETARCH=${TARGETARCH} ./prepare.sh
+
+# Install cross-compilation tools
+RUN apt-get update && \
+    apt-get install -y gcc-x86-64-linux-gnu && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install the required target
+RUN rustup target add x86_64-unknown-linux-gnu
+
+# Set up cross-compilation environment for x86_64
+ENV PKG_CONFIG_ALLOW_CROSS=1
+ENV RUSTFLAGS="-C linker=x86_64-linux-gnu-gcc -L/usr/x86_64-linux-gnu/lib"
+ENV C_INCLUDE_PATH=/usr/include
 
 # The recipe.json is the equivalent of the Python requirements.txt file - it is the only
 # input required for cargo chef cook, the command that will build out our dependencies.

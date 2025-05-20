@@ -25,3 +25,5 @@ pathfinder-var.env
 
 # mdbook compilation
 **/book/
+./pathfinder-db-production/
+./pathfinder-db-prod/
