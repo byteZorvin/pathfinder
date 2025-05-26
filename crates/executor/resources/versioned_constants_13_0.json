@@ -491,7 +491,7 @@
             "n_memory_holes": 0
         }
     },
-    "validate_max_n_steps": 1000000,
+    "validate_max_n_steps": 10000000,
     "vm_resource_fee_cost": {
         "add_mod_builtin": [
             0,
